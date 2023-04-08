@@ -1,19 +1,76 @@
 "use strict";
 
-//General class
-
-class Builder {
-    constructor(startValue = "") {
-        this.value = startValue;
-    }
-
-    get() {
-        return this.value;
-    }
+//Parent class
+function Builder(startValue) {
+    this.value = startValue;
 }
 
-//Child Class - IntBuilder in ES6
+//Common methods for str and int
+Builder.prototype.get = function () {
+    return this.value;
+}
+Builder.prototype.plus = function () { }
+Builder.prototype.minus = function () { }
+Builder.prototype.multiply = function () { }
+Builder.prototype.divide = function () { }
 
+//Unique methods for string
+Builder.prototype.remove = function (letter) {
+    var result = "";
+    for (var i = 0; i < this.value.length; i++) {
+        if (this.value[i] !== letter) {
+            result += this.value.substring(i, i + 1);
+        }
+    }
+    this.value = result;
+    return this;
+}
+
+Builder.prototype.sub = function (start, length) {
+    this.value = this.value.substr(start, length);
+    return this;
+}
+
+//Unique methods for int
+
+Builder.prototype.mod = function (number) {
+    this.value %= number;
+    return this;
+}
+
+// Child Class - StrBuilder in ES5
+function StringBuilder(startValue) {
+    Builder.call(this, startValue || "");
+}
+
+StringBuilder.prototype = Object.create(Builder.prototype);
+StringBuilder.prototype.constructor = StringBuilder;
+
+StringBuilder.prototype.plus = function (arg) {
+    var strings = [arg];
+    for (var i = 0; i < strings.length; i++) {
+        this.value += strings[i];
+    }
+    return this;
+}
+
+StringBuilder.prototype.minus = function (number) {
+    this.value = this.value.slice(0, this.value.length - number);
+    return this;
+}
+
+StringBuilder.prototype.multiply = function (number) {
+    this.value = this.value.repeat(number);
+    return this;
+}
+
+StringBuilder.prototype.divide = function (number) {
+    this.value = this.value.slice(0, number);
+    return this;
+}
+
+
+//Child Class - IntBuilder in ES6
 class IntBuilder extends Builder {
     constructor(startValue = 0) {
         super(startValue);
@@ -46,53 +103,6 @@ class IntBuilder extends Builder {
         this.value /= number;
         return this;
     }
-
-    mod(number) {
-        this.value %= number;
-        return this;
-    }
-}
-
-// Child Class - StrBuilder in ES5
-
-function StringBuilder(startValue = '') {
-    const instance = Reflect.construct(Builder, [startValue], StringBuilder);
-    Object.assign(this, instance);
-}
-
-StringBuilder.prototype = Object.create(Builder.prototype);
-StringBuilder.prototype.constructor = StringBuilder;
-
-StringBuilder.prototype.plus = function (...strings) {
-    for (let string of strings) {
-        this.value += string;
-    }
-    return this;
-}
-
-StringBuilder.prototype.minus = function (number) {
-    this.value = this.value.slice(0, (this.value.length - number));
-    return this;
-}
-
-StringBuilder.prototype.multiply = function (number) {
-    this.value = this.value.repeat(number);
-    return this;
-}
-
-StringBuilder.prototype.divide = function (number) {
-    this.value = this.value.slice(0, (Math.floor(this.value.length / number)));
-    return this;
-}
-
-StringBuilder.prototype.remove = function (letter) {
-    this.value = this.value.split('').filter(str => str !== letter).join('');
-    return this;
-}
-
-StringBuilder.prototype.sub = function (start, length) {
-    this.value = this.value.substr(start, length);
-    return this;
 }
 
 // Example with string
