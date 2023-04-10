@@ -9,34 +9,17 @@ function Builder(startValue) {
 Builder.prototype.get = function () {
     return this.value;
 }
-Builder.prototype.plus = function () { }
+
+Builder.prototype.plus = function () {
+    for (var i = 0; i < arguments.length; i++) {
+        this.value += arguments[i];
+    }
+    return this;
+}
+
 Builder.prototype.minus = function () { }
 Builder.prototype.multiply = function () { }
 Builder.prototype.divide = function () { }
-
-//Unique methods for string
-Builder.prototype.remove = function (letter) {
-    var result = "";
-    for (var i = 0; i < this.value.length; i++) {
-        if (this.value[i] !== letter) {
-            result += this.value.substring(i, i + 1);
-        }
-    }
-    this.value = result;
-    return this;
-}
-
-Builder.prototype.sub = function (start, length) {
-    this.value = this.value.substr(start, length);
-    return this;
-}
-
-//Unique methods for int
-
-Builder.prototype.mod = function (number) {
-    this.value %= number;
-    return this;
-}
 
 // Child Class - StrBuilder in ES5
 function StringBuilder(startValue) {
@@ -44,16 +27,8 @@ function StringBuilder(startValue) {
 }
 
 StringBuilder.prototype = Object.create(Builder.prototype);
-StringBuilder.prototype.constructor = StringBuilder;
 
-StringBuilder.prototype.plus = function (arg) {
-    var strings = [arg];
-    for (var i = 0; i < strings.length; i++) {
-        this.value += strings[i];
-    }
-    return this;
-}
-
+//Methods of StringBuilder
 StringBuilder.prototype.minus = function (number) {
     this.value = this.value.slice(0, this.value.length - number);
     return this;
@@ -69,6 +44,15 @@ StringBuilder.prototype.divide = function (number) {
     return this;
 }
 
+StringBuilder.prototype.remove = function (str) {
+    this.value = this.value.slice(0, this.value.indexOf(str));
+    return this;
+}
+
+StringBuilder.prototype.sub = function (start, length) {
+    this.value = this.value.substr(start, length);
+    return this;
+}
 
 //Child Class - IntBuilder in ES6
 class IntBuilder extends Builder {
@@ -78,13 +62,6 @@ class IntBuilder extends Builder {
 
     static random(from, to) {
         return Math.floor(Math.random() * (Math.floor(to) - Math.ceil(from) - 1) + Math.ceil(from));
-    }
-
-    plus(...numbers) {
-        for (let number of numbers) {
-            this.value += number;
-        }
-        return this;
     }
 
     minus(...numbers) {
@@ -101,6 +78,11 @@ class IntBuilder extends Builder {
 
     divide(number) {
         this.value /= number;
+        return this;
+    }
+
+    mod(number) {
+        this.value %= number;
         return this;
     }
 }
